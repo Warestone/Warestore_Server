@@ -1,0 +1,50 @@
+insert into types (name) values
+('user'),('location'),('item'),
+('product'),('order'),('category'),
+('summary');
+
+insert into attributes (name) values
+('name'),('email'),('phone_number'),('role'),('address'),
+('price'),('location'),('items'),('product'),('user_id'),
+('description'),('product_type'),('quantity');
+
+insert into attribute_type values
+(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),
+(3,1),(2,1),(4,1);
+
+insert into objects (name, type_id) values
+('weapons',6),
+('ammo',6),
+('accessories',6),
+('targets',6);
+
+insert into parameters values
+(1,1,'Оружие'),
+(2,1,'Боеприпасы'),
+(3,1,'Аксессуары'),
+(4,1,'Мишени');
+
+
+
+//select all parameters of types
+select 'Id ' || t1.id || '  ' || t1.name as types, 'Id ' || a1.id || '  ' || a1.name as attributes
+from attributes a1, types t1, attribute_type at1 
+where at1.attribute_id = a1.id and at1.type_id = t1.id
+
+//select 1 level menu
+
+//all types will found
+select p1.value as name from objects o1, types t1, attribute_type at1, attributes a1, parameters p1 
+where o1.type_id = t1.id and at1.type_id = t1.id and a1.id = at1.attribute_id and p1.object_id = o1.id 
+and p1.attribute_id = a1.id and t1.name='category' 
+
+// only 1 - name
+select param.value as name from objects obj, types typ, parameters param 
+where obj.type_id = typ.id
+and typ.name='category'
+and param.object_id = obj.id
+and param.attribute_id = 1
+order by name
+
+
+
