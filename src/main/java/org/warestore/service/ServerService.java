@@ -5,15 +5,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.warestore.dao.*;
 import org.warestore.mapper.CategoryMapper;
+import org.warestore.mapper.RifleMapper;
 import org.warestore.model.dto.*;
 import org.warestore.model.object.Category;
+import org.warestore.model.object.Rifle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 @Service
 public class ServerService {
-    private List<Category> firstLevelCategory = new ArrayList<>();
+    private List<Category> categoriesList = new ArrayList<>();
+    private List<Rifle> riflesList = new ArrayList<>();
     private final Logger logger = Logger.getLogger(ServerService.class.getName());
     @Autowired
     private AttributesDAO attributesDAO;
@@ -34,16 +37,17 @@ public class ServerService {
 
     }
 
-    public List<Category> getFirstLevelCategory(JdbcTemplate jdbcTemplate){
-        logger.info("Return first level category.");
-        if (firstLevelCategory.size()!=0) return firstLevelCategory;
-        return firstLevelCategory = jdbcTemplate.query(
-                "select param.value as name from objects obj, types typ, parameters param \n" +
-                "where obj.type_id = typ.id\n" +
-                "and typ.name='category'\n" +
-                "and param.object_id = obj.id\n" +
-                "and param.attribute_id = 1\n" +
-                "order by name", new CategoryMapper());
+    public List<Category> getCategories(JdbcTemplate jdbcTemplate){
+        logger.info("Return categories.");
+        if (categoriesList.size()!=0) return categoriesList;
+        return categoriesList = jdbcTemplate.query(
+                "select id, name from objects where type_id = 6", new CategoryMapper());
+    }
+
+    public List<Rifle> getRifles(JdbcTemplate jdbcTemplate){
+        logger.info("Return rifles.");
+        return riflesList = jdbcTemplate.query(
+                "", new RifleMapper());
     }
 
     public String addObject(ObjectsDTO objectDTO){

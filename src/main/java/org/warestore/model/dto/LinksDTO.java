@@ -8,9 +8,11 @@ import javax.persistence.*;
 @Table(name = "links")
 public class LinksDTO {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     private int attribute_id;
 
-    //@Id
     private int object_id;
 
     private int reference_obj;

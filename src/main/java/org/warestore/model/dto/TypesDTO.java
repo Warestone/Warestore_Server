@@ -11,6 +11,5 @@ public class TypesDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    //@Id
     private String name;
 }

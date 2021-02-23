@@ -8,8 +8,10 @@ import javax.persistence.*;
 @Table(name = "attribute_type")
 public class AttributeTypeDTO {
     @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private int id;
+
     private int attribute_id;
 
-    //@Id
     private int type_id;
 }

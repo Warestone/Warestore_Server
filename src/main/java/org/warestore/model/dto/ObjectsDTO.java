@@ -2,7 +2,6 @@ package org.warestore.model.dto;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Data
@@ -12,9 +11,7 @@ public class ObjectsDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-
     private String name;
-
 
     private int type_id;
 

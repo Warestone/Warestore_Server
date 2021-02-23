@@ -1,50 +1,131 @@
+create table attribute_type (
+	id serial not null primary key,
+	attribute_id integer not null UNIQUE,
+	type_id integer not null UNIQUE,
+	FOREIGN KEY (type_id) REFERENCES types (id) ON DELETE CASCADE,
+	FOREIGN KEY (attribute_id) REFERENCES attributes (id) ON DELETE CASCADE
+)
+
+create table types (
+	id serial not null primary key,
+	name varchar not null,
+	UNIQUE(id),
+	UNIQUE(name)
+)
+
+create table attributes (
+	id serial not null primary key,
+	name varchar not null,
+	UNIQUE(id),
+	UNIQUE(name)
+)
+
+create table attribute_type (
+	id serial not null primary key,
+	attribute_id integer not null,
+	type_id integer not null,
+	FOREIGN KEY (type_id) REFERENCES types (id) ON DELETE CASCADE,
+	FOREIGN KEY (attribute_id) REFERENCES attributes (id) ON DELETE CASCADE
+)
+
+create table parameters (
+	id serial not null primary key,
+	object_id integer not null,
+	attribute_id integer not null,
+	value varchar not null,
+	FOREIGN KEY (object_id) REFERENCES objects (id) ON DELETE CASCADE,
+	FOREIGN KEY (attribute_id) REFERENCES attributes (id) ON DELETE CASCADE
+)
+
+create table objects (
+	id serial not null primary key,
+	name varchar not null,
+	type_id integer not null,
+	parent_id integer,
+	UNIQUE(id),
+	UNIQUE(name),
+	FOREIGN KEY (parent_id) REFERENCES objects (id) ON DELETE CASCADE,
+	FOREIGN KEY (type_id) REFERENCES types (id) ON DELETE CASCADE
+)
+
+create table users (
+	id serial not null primary key,
+	object_id integer not null UNIQUE,
+	password varchar not null,
+	FOREIGN KEY (object_id) REFERENCES objects (id) ON DELETE CASCADE
+)
+
+create table links (
+	id serial not null primary key,
+	attribute_id integer not null,
+	object_id integer not null,
+	reference_obj_id integer,
+	UNIQUE(attribute_id, object_id,reference_obj_id),
+	FOREIGN KEY (attribute_id) REFERENCES attributes (id) ON DELETE CASCADE,
+	FOREIGN KEY (object_id) REFERENCES objects (id) ON DELETE CASCADE,
+	FOREIGN KEY (reference_obj_id) REFERENCES objects (id) ON DELETE CASCADE
+)
+
+
+
+
 insert into types (name) values
 ('user'),('location'),('item'),
 ('product'),('order'),('category'),
 ('summary');
 
+
 insert into attributes (name) values
-('name'),('email'),('phone_number'),('role'),('address'),
+('email'),('phone_number'),('role'),('address'),
 ('price'),('location'),('items'),('product'),('user_id'),
-('description'),('product_type'),('quantity');
+('description'),('product_type'),('quantity'),('caliber');
 
-insert into attribute_type values
-(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),
-(3,1),(2,1),(4,1);
+insert into attribute_type (type_id, attribute_id) values
+(4,10),(4,12),(4,5),(4,11),
+(1,3),(1,2),(1,4),
+(8,13);
 
+//insert categories
 insert into objects (name, type_id) values
-('weapons',6),
-('ammo',6),
-('accessories',6),
-('targets',6);
+('Нарезное оружие',6),
+('Гладкоствольное оружие',6),
+('Пневматическое оружие',6),
+('Боеприпасы',6),
+('Мишени',6);
 
-insert into parameters values
-(1,1,'Оружие'),
-(2,1,'Боеприпасы'),
-(3,1,'Аксессуары'),
-(4,1,'Мишени');
+//insert rifles
+insert into objects (name, type_id, parent_id) values
+('Карабин Вепрь 1В кал. 7,62х51 (.308 Win), скл. прикл., L=520',8,1),
+('Карабин Сайга-МК кал. 7,62х39, исп. 030, плс, пр/скл, ППР10, ДТ, МГ10Д-1, L-415',8,1),
+('Карабин «Сайга-308-1» исп.61, 415, плс., ДТ, мг8-2',8,1),
+('Карабин Сайга-9 кал. 9х19, исп. 02',8,1),
+('Карабин Benelli Argo-E Comfort кал. 30-06 L=510',8,1),
+('Карабин Sabatti ROVER 870 THUMBHOLE, кал. 308 Win, пластик ствол (560 мм)',8,1),
+('Самозарядный карабин TR3; 5,45х39; 415, пр/трубч, ДТ(ИЖ-1614)',8,1),
+('Карабин Sabatti ST18 cal. 308 Win',8,1),
+('Карабин Вепрь Супер кал. 7,62х51 (.308 Win) L=650 б/о',8,1),
+('Карабин охотничий Hatsan Escort 22 LR, кал.22 LR (с пластик.прикладом) (Хатсан эскорт)',8,1)
 
+insert into parameters (object_id, attribute_id, value) values
+(6,5,'22000.500'),(6,10,'Охотничья винтовка 1, ибо писать описание к ней долго, будет так, вот'),(6,11,'8'),(6,12,'5'),(6,13,'.308 Vin.'),
+(7,5,'56000.00'),(7,10,'Охотничья винтовка 2, ибо писать описание к ней долго, будет так, вот'),(7,11,'8'),(7,12,'1'),(7,13,'7,62x39'),
+(8,5,'34600.00'),(8,10,'Охотничья винтовка 3, ибо писать описание к ней долго, будет так, вот'),(8,11,'8'),(8,12,'3'),(8,13,'.308 Vin.'),
+(9,5,'40000.00'),(9,10,'Охотничья винтовка 4, ибо писать описание к ней долго, будет так, вот'),(9,11,'8'),(9,12,'12'),(9,13,'9x19'),
+(10,5,'34500.00'),(10,10,'Охотничья винтовка 5, ибо писать описание к ней долго, будет так, вот'),(10,11,'8'),(10,12,'10'),(10,13,'30-06'),
+(11,5,'54333.00'),(11,10,'Охотничья винтовка 6, ибо писать описание к ней долго, будет так, вот'),(11,11,'8'),(11,12,'4'),(11,13,'.308 Vin.'),
+(12,5,'40000.500'),(12,10,'Охотничья винтовка 7, ибо писать описание к ней долго, будет так, вот'),(12,11,'8'),(12,12,'6'),(12,13,'5,45x39'),
+(13,5,'70000.00'),(13,10,'Охотничья винтовка 8, ибо писать описание к ней долго, будет так, вот'),(13,11,'8'),(13,12,'8'),(13,13,'.308 Vin.'),
+(14,5,'109000.00'),(14,10,'Охотничья винтовка 9, ибо писать описание к ней долго, будет так, вот'),(14,11,'8'),(14,12,'9'),(14,13,'7,62x51'),
+(15,5,'48900.00'),(15,10,'Охотничья винтовка 10, ибо писать описание к ней долго, будет так, вот'),(15,11,'8'),(15,12,'0'),(15,13,'.22 LR')
 
+//Get categories
+select id, name from objects where type_id = 6
 
-//select all parameters of types
-select 'Id ' || t1.id || '  ' || t1.name as types, 'Id ' || a1.id || '  ' || a1.name as attributes
-from attributes a1, types t1, attribute_type at1 
-where at1.attribute_id = a1.id and at1.type_id = t1.id
+//Get attributes at types
+select tp.name, attr.name from attribute_type at, types tp, attributes attr
+where at.attribute_id = attr.id and at.type_id = tp.id
 
-//select 1 level menu
-
-//all types will found
-select p1.value as name from objects o1, types t1, attribute_type at1, attributes a1, parameters p1 
-where o1.type_id = t1.id and at1.type_id = t1.id and a1.id = at1.attribute_id and p1.object_id = o1.id 
-and p1.attribute_id = a1.id and t1.name='category' 
-
-// only 1 - name
-select param.value as name from objects obj, types typ, parameters param 
-where obj.type_id = typ.id
-and typ.name='category'
-and param.object_id = obj.id
-and param.attribute_id = 1
-order by name
-
-
+//Get all products (type - rifle)
+select obj.name, param.value from objects obj, attributes attr, parameters param
+where param.object_id = obj.id and param.attribute_id = attr.id and obj.parent_id = 1
 

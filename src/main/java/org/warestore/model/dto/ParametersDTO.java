@@ -8,11 +8,12 @@ import javax.persistence.*;
 @Table(name = "parameters")
 public class ParametersDTO {
     @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private int id;
+
     private int object_id;
 
-    //@Id
     private int attribute_id;
 
-    //@Id
     private String value;
 }

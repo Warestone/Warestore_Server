@@ -16,8 +16,8 @@ public class ServerController {
     private final ServerService serverService = new ServerService();
 
     @GetMapping(value = "/get/category")
-    public List<Category>getFirstLevelCategory(){
-        return serverService.getFirstLevelCategory(jdbcTemplate);
+    public List<Category>getCategories(){
+        return serverService.getCategories(jdbcTemplate);
     }
 
     @PostMapping(value = "/post/object")

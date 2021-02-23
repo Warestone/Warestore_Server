@@ -11,7 +11,6 @@ public class UsersDTO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    //@Id
     private int object_id;
 
     private String password;
