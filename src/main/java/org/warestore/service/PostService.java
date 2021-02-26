@@ -1,23 +1,15 @@
 package org.warestore.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.warestore.dao.*;
-import org.warestore.mapper.CategoryMapper;
-import org.warestore.mapper.RifleMapper;
 import org.warestore.model.dto.*;
-import org.warestore.model.object.Category;
-import org.warestore.model.object.Rifle;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 @Service
-public class ServerService {
-    private List<Category> categoriesList = new ArrayList<>();
-    private List<Rifle> riflesList = new ArrayList<>();
-    private final Logger logger = Logger.getLogger(ServerService.class.getName());
+public class PostService {
+    private final Logger logger = Logger.getLogger(PostService.class.getName());
+
     @Autowired
     private AttributesDAO attributesDAO;
     @Autowired
@@ -33,22 +25,7 @@ public class ServerService {
     @Autowired
     private UsersDAO usersDAO;
 
-    private enum Types{
 
-    }
-
-    public List<Category> getCategories(JdbcTemplate jdbcTemplate){
-        logger.info("Return categories.");
-        if (categoriesList.size()!=0) return categoriesList;
-        return categoriesList = jdbcTemplate.query(
-                "select id, name from objects where type_id = 6", new CategoryMapper());
-    }
-
-    public List<Rifle> getRifles(JdbcTemplate jdbcTemplate){
-        logger.info("Return rifles.");
-        return riflesList = jdbcTemplate.query(
-                "", new RifleMapper());
-    }
 
     public String addObject(ObjectsDTO objectDTO){
         objectsDAO.save(objectDTO);
