@@ -10,7 +10,6 @@ import org.warestore.model.object.Category;
 import org.warestore.model.object.Target;
 import org.warestore.model.object.Weapon;
 import org.warestore.service.CatalogService;
-
 import java.util.List;
 
 @RestController
@@ -21,9 +20,7 @@ public class CatalogController {
     private final CatalogService catalogService = new CatalogService();
 
     @GetMapping(value = "/get/category")
-    public List<Category> getCategories(){
-        return catalogService.getCategories(jdbcTemplate);
-    }
+    public List<Category> getCategories(){ return catalogService.getCategories(jdbcTemplate); }
 
     @GetMapping(value = "/get/rifle")
     public List<Weapon>getRifles(){
