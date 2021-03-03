@@ -3,6 +3,7 @@ package org.warestore.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.warestore.model.object.Ammo;
@@ -46,4 +47,21 @@ public class CatalogController {
     public List<Target>getTarget(){
         return catalogService.getTargets(jdbcTemplate);
     }
+
+
+
+    @GetMapping(value = "/get/rifle_page/{id}")
+    public List<Weapon>getRiflesPage(@PathVariable int id){ return catalogService.getRiflesPage(jdbcTemplate, id); }
+
+    @GetMapping(value = "/get/shotgun_page/{id}")
+    public List<Weapon>getShotgunsPage(@PathVariable int id){ return catalogService.getShotgunsPage(jdbcTemplate, id); }
+
+    @GetMapping(value = "/get/airgun_page/{id}")
+    public List<Weapon>getAirgunsPage(@PathVariable int id){ return catalogService.getAirgunsPage(jdbcTemplate, id); }
+
+    @GetMapping(value = "/get/ammo_page/{id}")
+    public List<Ammo>getAmmoPage(@PathVariable int id){ return catalogService.getAmmoPage(jdbcTemplate, id); }
+
+    @GetMapping(value = "/get/target_page/{id}")
+    public List<Target>getTargetsPage(@PathVariable int id){ return catalogService.getTargetPage(jdbcTemplate, id); }
 }

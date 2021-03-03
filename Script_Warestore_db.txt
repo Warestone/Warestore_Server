@@ -278,6 +278,12 @@ where param.object_id = obj.id and param.attribute_id = attr.id and obj.parent_i
 select obj.id, obj.name, attr.name as type, param.value from objects obj, attributes attr, parameters param
 where param.object_id = obj.id and param.attribute_id = attr.id and obj.parent_id = 5 and attr.name !='product_type'
 
+//Pagging
+select obj.id, obj.name, attr.name as type, param.value from objects obj, attributes attr, parameters param
+where param.object_id = obj.id and param.attribute_id = attr.id and obj.parent_id = 1 and attr.name !='product_type' 
+order by id limit 4 offset 0
+
+
 //Get all parameters of types
 select tp.id as type_id, tp.name as type_name, attr.id as attr_id, 
 attr.name as atrr_name from attribute_type at, types tp, attributes attr
