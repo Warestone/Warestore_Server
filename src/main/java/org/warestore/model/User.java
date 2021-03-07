@@ -1,4 +1,4 @@
-package org.warestore.model.object;
+package org.warestore.model;
 
 import lombok.Data;
 

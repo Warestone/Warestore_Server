@@ -1,7 +1,7 @@
 package org.warestore.mapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import org.warestore.model.object.Weapon;
+import org.warestore.model.Weapon;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.warestore.model.object.Ammo;
-import org.warestore.model.object.Category;
-import org.warestore.model.object.Target;
-import org.warestore.model.object.Weapon;
+import org.warestore.model.Ammo;
+import org.warestore.model.Category;
+import org.warestore.model.Target;
+import org.warestore.model.Weapon;
 import org.warestore.service.CatalogService;
 import java.util.List;
 

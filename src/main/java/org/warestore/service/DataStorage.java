@@ -1,10 +1,10 @@
 package org.warestore.service;
 
 import org.springframework.stereotype.Component;
-import org.warestore.model.object.Ammo;
-import org.warestore.model.object.Category;
-import org.warestore.model.object.Target;
-import org.warestore.model.object.Weapon;
+import org.warestore.model.Ammo;
+import org.warestore.model.Category;
+import org.warestore.model.Target;
+import org.warestore.model.Weapon;
 import java.util.ArrayList;
 import java.util.List;
 

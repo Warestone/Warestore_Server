@@ -90,13 +90,28 @@ insert into attributes (name) values
 
 insert into attribute_type (type_id, attribute_id) values
 (4,10),(4,12),(4,5),(4,11), // product
-(1,3),(1,2),(1,4),			// user
+(1,3),(1,2),(1,4),(1,1),	// user
 (8,13),						// weapon
 (6,14),						// category
 (9,13)						// shotgun
 (10,13),					// airgun
 (11,16),(11,13),			// ammo
 (12,17)						// target
+
+
+
+
+//insert users
+insert into objects (name, type_id) values
+('admin',1)
+
+insert into users (object_id, password) values
+((select id from objects where name = 'admin'),
+'$2y$12$mS2lgQWSEkukeP3EZinPZ.ef/10Vt3B7b5N9p9o249Mnmu6q9s6wy')
+
+insert into parameters (object_id, attribute_id, value) values
+(76,3,'ROLE_ADMIN')
+
 
 
 
@@ -255,7 +270,7 @@ select obj.name, param.value as url from objects obj, attributes attr, parameter
 where param.object_id = obj.id and param.attribute_id = attr.id and obj.type_id = 6
 
 //Get attributes at types
-select tp.name as type_name, attr.name as attribute_name from attribute_type at, types tp, attributes attr
+select tp.id as type_id, tp.name as type_name, attr.id as attribute_id, attr.name as attribute_name from attribute_type at, types tp, attributes attr
 where at.attribute_id = attr.id and at.type_id = tp.id
 
 //Get all rifles
@@ -283,8 +298,11 @@ select obj.id, obj.name, attr.name as type, param.value from objects obj, attrib
 where param.object_id = obj.id and param.attribute_id = attr.id and obj.parent_id = 1 and attr.name !='product_type' 
 order by id limit 4 offset 0
 
-
 //Get all parameters of types
 select tp.id as type_id, tp.name as type_name, attr.id as attr_id, 
 attr.name as atrr_name from attribute_type at, types tp, attributes attr
 where attr.id = at.attribute_id and tp.id = at.type_id order by type_name desc
+
+//Get user credentials
+select usr.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param 
+where usr.object_id = obj.id and param.object_id = obj.id
