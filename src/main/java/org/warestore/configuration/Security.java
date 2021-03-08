@@ -1,6 +1,5 @@
 package org.warestore.configuration;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +16,8 @@ import org.warestore.configuration.jwt.JwtFilter;
 @EnableWebSecurity
 public class Security extends WebSecurityConfigurerAdapter {
 
-    final JwtFilter jwtFilter;
-
-    public Security(JwtFilter jwtFilter) { this.jwtFilter = jwtFilter; }
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception{
@@ -29,8 +27,8 @@ public class Security extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/server/user/*").hasAnyRole("ADMIN","USER")
-                .antMatchers("/server/auth","/server/register", "/server/catalog/*").permitAll()
+                .antMatchers("/server/user/get/**").hasAnyRole("ADMIN","USER")
+                .antMatchers("/server/user/auth","/server/user/register", "/server/catalog/**").permitAll()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }

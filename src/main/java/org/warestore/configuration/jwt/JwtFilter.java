@@ -2,9 +2,12 @@ package org.warestore.configuration.jwt;
 
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-
+import org.warestore.configuration.CustomUserDetails;
+import org.warestore.service.CustomUserDetailsService;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -16,19 +19,26 @@ import java.io.IOException;
 @Component
 public class JwtFilter extends GenericFilterBean {
 
-    final JwtProvider jwtProvider;
+    @Autowired
+    private JwtProvider jwtProvider;
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
-    public JwtFilter(JwtProvider jwtProvider) { this.jwtProvider = jwtProvider; }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        log.info("Filter is working.");
         String token = getTokenFromRequest((HttpServletRequest) servletRequest);
         if (token!=null){
             if (jwtProvider.validateJWT(token)){
+                log.info("The filter passes the request.");
                 String username = jwtProvider.getUsernameFromToken(token);
+                CustomUserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     private String getTokenFromRequest(HttpServletRequest request){

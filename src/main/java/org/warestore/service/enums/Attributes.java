@@ -17,5 +17,5 @@ public enum Attributes {
     CALIBER,
     URL,
     ROUNDS,
-    SIZE;
+    SIZE
 }
