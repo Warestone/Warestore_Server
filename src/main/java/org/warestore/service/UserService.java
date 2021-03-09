@@ -9,7 +9,6 @@ import org.warestore.mapper.UserMapper;
 import org.warestore.model.User;
 import org.warestore.service.enums.Attributes;
 import org.warestore.service.enums.Types;
-
 import java.util.List;
 
 @Log
@@ -21,13 +20,13 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     public User getUserByName(String username){
         log.info("Return user "+username+" by username.");
         List<User> users = jdbcTemplate.query("select usr.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param \n" +
                 "where usr.object_id = obj.id and param.object_id = obj.id and obj.name = '"+username+"'",
                 new UserMapper());
-        return users.get(0);
+        if (users.size()==0)return null;
+        else return users.get(0);
     }
 
     public User getUserByNameAndPassword(String username, String password){

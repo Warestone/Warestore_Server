@@ -11,5 +11,5 @@ public enum Types {
     SUMMARY,
     RIFLE,
     SHOTGUN,
-    AIRGUN
+    AIRGUN;
 }

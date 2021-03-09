@@ -1,7 +1,9 @@
 package org.warestore.service;
 
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.warestore.mapper.AmmoMapper;
 import org.warestore.mapper.CategoryMapper;
@@ -19,14 +21,13 @@ import java.util.List;
 @Service
 public class CatalogService {
 
-    public CatalogService(JdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    private final JdbcTemplate jdbcTemplate;
-
-    private final static String GET_WEAPON_OR_AMMO_PAGE_QUERY_1 = "select obj.id, obj.name, attr.name as type, param.value from objects obj, attributes attr, parameters param\n" +
+    private final static String GET_WEAPON_OR_AMMO_PAGE_QUERY_PART1 = "select obj.id, obj.name, attr.name as type, param.value from objects obj, attributes attr, parameters param\n" +
             "where param.object_id = obj.id and param.attribute_id = attr.id and obj.parent_id = ";
-    private final static String GET_WEAPON_OR_AMMO_PAGE_QUERY_2 = " and attr.name !='product_type' " +
-            "limit 20 offset ";
+    private final static String GET_WEAPON_OR_AMMO_PAGE_QUERY_PART2 = " and attr.name !='product_type' " +
+            "limit ";
     private final static String GET_CATEGORY_QUERY = "select obj.name, param.value as url from objects obj, attributes attr, parameters param\n" +
             "where param.object_id = obj.id and param.attribute_id = attr.id and obj.type_id = ";
 
@@ -44,27 +45,27 @@ public class CatalogService {
 
     public List<Weapon> getRiflesPage(int page){
         log.info("Return rifles page "+page);
-        return jdbcTemplate.query(GET_WEAPON_OR_AMMO_PAGE_QUERY_1+Categories.RIFLES.ordinal()+
-                GET_WEAPON_OR_AMMO_PAGE_QUERY_2+page*20, new WeaponMapper());
+        return (List<Weapon>) getData(page,Categories.RIFLES.ordinal(), new WeaponMapper(),20);
     }
     public List<Weapon> getShotgunsPage(int page){
         log.info("Return shotguns page "+page);
-        return jdbcTemplate.query(GET_WEAPON_OR_AMMO_PAGE_QUERY_1+Categories.SHOTGUNS.ordinal()+
-                GET_WEAPON_OR_AMMO_PAGE_QUERY_2+page*20, new WeaponMapper());
+        return (List<Weapon>) getData(page,Categories.SHOTGUNS.ordinal(), new WeaponMapper(),20);
     }
     public List<Weapon> getAirgunsPage(int page){
         log.info("Return airguns page "+page);
-        return jdbcTemplate.query(GET_WEAPON_OR_AMMO_PAGE_QUERY_1+Categories.AIRGUNS.ordinal()+
-                GET_WEAPON_OR_AMMO_PAGE_QUERY_2+page*20, new WeaponMapper());
+        return (List<Weapon>) getData(page,Categories.AIRGUNS.ordinal(), new WeaponMapper(),20);
     }
     public List<Ammo> getAmmoPage(int page){
         log.info("Return ammo page "+page);
-        return jdbcTemplate.query(GET_WEAPON_OR_AMMO_PAGE_QUERY_1+Categories.AMMO.ordinal()+
-                GET_WEAPON_OR_AMMO_PAGE_QUERY_2+page*20, new AmmoMapper());
+        return (List<Ammo>) getData(page,Categories.AMMO.ordinal(), new AmmoMapper(),25);
     }
     public List<Target> getTargetPage(int page){
         log.info("Return ammo page "+page);
-        return jdbcTemplate.query(GET_WEAPON_OR_AMMO_PAGE_QUERY_1+Categories.TARGETS.ordinal()+
-                GET_WEAPON_OR_AMMO_PAGE_QUERY_2+page*20, new TargetMapper());
+        return (List<Target>) getData(page,Categories.TARGETS.ordinal(), new TargetMapper(),20);
+    }
+
+    private List<?> getData(int page, int typeId, RowMapper rowMapper, int limit){
+        return jdbcTemplate.query(GET_WEAPON_OR_AMMO_PAGE_QUERY_PART1 +typeId+
+                GET_WEAPON_OR_AMMO_PAGE_QUERY_PART2 +limit+" offset "+limit*page, rowMapper);
     }
 }
