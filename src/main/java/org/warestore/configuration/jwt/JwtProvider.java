@@ -30,8 +30,8 @@ public class JwtProvider {
             return true;
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             log.warning("Invalid token.");
+            return false;
         }
-        return false;
     }
 
     public String getUsernameFromToken(String token){

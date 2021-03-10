@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.warestore.mapper.UserMapper;
 import org.warestore.model.User;
 import org.warestore.service.enums.Attributes;
 import org.warestore.service.enums.Types;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Log
 @Service
@@ -21,6 +24,9 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public User getUserByName(String username){
+        Pattern pattern = Pattern.compile("[a-z0-9A-Z]{5,20}");
+        Matcher matcher = pattern.matcher(username);
+        if (!matcher.find()) return null;
         log.info("Return user "+username+" by username.");
         List<User> users = jdbcTemplate.query("select usr.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param \n" +
                 "where usr.object_id = obj.id and param.object_id = obj.id and obj.name = '"+username+"'",
@@ -39,6 +45,8 @@ public class UserService {
         return null;
     }
 
+    //need test, but sure
+    @Transactional
     public User saveUser(User user){
         if (getUserByName(user.getUsername())!=null) return null;
         log.info("Save user "+user.getUsername()+".");

@@ -56,8 +56,9 @@ public class JwtFilter extends GenericFilterBean {
     private String getTokenFromRequest(HttpServletRequest request){
         String bearer = request.getHeader("Authorization");
         if (bearer!=null){
-            if (bearer.startsWith("Bearer ")){
-                return bearer.substring(7);
+            bearer = bearer.replaceAll(" ","");
+            if (bearer.startsWith("Bearer")){
+                return bearer.substring(6);
             }
         }
         return null;
@@ -69,6 +70,6 @@ public class JwtFilter extends GenericFilterBean {
 
     private boolean validateApplication(String key){
         if (key==null)return false;
-        else return passwordEncoder.matches(key, environment.getProperty("app.secret"));
+        else return passwordEncoder.matches(environment.getProperty("app.secret"),key);
     }
 }
