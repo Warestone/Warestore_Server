@@ -102,15 +102,16 @@ insert into attribute_type (type_id, attribute_id) values
 
 
 //insert users
-insert into objects (name, type_id) values
+insert into objects (name, type_id) values //name
 ('admin',1)
 
-insert into users (object_id, password) values
+insert into users (object_id, password) values // password
 ((select id from objects where name = 'admin'),
 '$2y$12$mS2lgQWSEkukeP3EZinPZ.ef/10Vt3B7b5N9p9o249Mnmu6q9s6wy')
 
-insert into parameters (object_id, attribute_id, value) values
-(76,3,'ROLE_ADMIN')
+
+insert into parameters (object_id, attribute_id, value) values //other credeintials (role, email, phone_number, location_id -> Object with type 'location', name = address)
+(76,3,'ROLE_ADMIN'),(76,1,'admin@email.com'),(76,2,'8-800-555-35-35'),(76,4,'Россия, Нижний Новгород, проспект Гагарина 23/4')
 
 
 

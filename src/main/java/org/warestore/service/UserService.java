@@ -53,14 +53,17 @@ public class UserService {
         jdbcTemplate.update("insert into objects (name, type_id) values " +
                 "('"+user.getUsername()+"',"+Types.USER.ordinal()+")");
 
-        jdbcTemplate.update("insert into users (object_id, password) values (" +
-                "(select id from objects where name = '"+user.getUsername()+"')," +
-                "('"+passwordEncoder.encode(user.getPassword())+"'))");
+        String idUser = jdbcTemplate.queryForObject("select id from objects where name = '"+user.getUsername()+"'",String.class);
 
-        //add all parameters in future
-        jdbcTemplate.update("insert into parameters (object_id, attribute_id, value) values (" +
-                "(select id from objects where name = '"+user.getUsername()+"')," +
-                 Attributes.ROLE.ordinal() +",'ROLE_USER')");
+        jdbcTemplate.update("insert into users (object_id, password) values " +
+                "("+idUser+", '"+passwordEncoder.encode(user.getPassword())+"')");
+
+        jdbcTemplate.update("insert into parameters (object_id, attribute_id, value) values " +
+                "("+idUser+","+Attributes.ROLE.ordinal()+",'ROLE_USER')," +
+                "("+idUser+","+Attributes.EMAIL.ordinal()+",'"+user.getEmail()+"')," +
+                "("+idUser+","+Attributes.PHONE_NUMBER.ordinal()+",'"+user.getPhoneNumber()+"')," +
+                "("+idUser+","+Attributes.ADDRESS.ordinal()+",'"+user.getAddress()+"')");
+
         return user;
     }
 }
