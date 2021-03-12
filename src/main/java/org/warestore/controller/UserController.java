@@ -24,13 +24,10 @@ public class UserController {
     }
 
     @PostMapping(value = "/register")
-    public String registerUser(@RequestBody @Valid UserRegistration userRegistration){
+    public UserRegistration registerUser(@RequestBody @Valid UserRegistration userRegistration){
         if (userService.getUserByName(userRegistration.getUsername())==null){
-            User user = new User();
-            //add all users parameters
-            user.setUsername(userRegistration.getUsername());
-            user.setPassword(userRegistration.getPassword());
-            return user.toString();
+            userService.saveUser(userRegistration);
+            return userRegistration;
         }
         else return null;
     }
