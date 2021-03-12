@@ -7,9 +7,7 @@ import org.warestore.model.User;
 import org.warestore.model.UserAuthentication;
 import org.warestore.model.UserRegistration;
 import org.warestore.service.UserService;
-
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 
 @RestController
 @RequestMapping(value = "/server/user")

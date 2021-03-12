@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.warestore.mapper.UserMapper;
 import org.warestore.model.User;
+import org.warestore.model.UserRegistration;
 import org.warestore.service.enums.Attributes;
 import org.warestore.service.enums.Types;
 import java.util.List;
@@ -47,7 +48,7 @@ public class UserService {
 
     //need test, but sure
     @Transactional
-    public User saveUser(User user){
+    public UserRegistration saveUser(UserRegistration user){
         if (getUserByName(user.getUsername())!=null) return null;
         log.info("Save user "+user.getUsername()+".");
         jdbcTemplate.update("insert into objects (name, type_id) values " +

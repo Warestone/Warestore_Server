@@ -9,10 +9,10 @@ public class UserRegistration {
     private String username;
     @NotEmpty
     private String password;
-    /*@NotEmpty
+    @NotEmpty
     private String email;
     @NotEmpty
     private String phoneNumber;
     @NotEmpty
-    private String address;*/
+    private String address;
 }
