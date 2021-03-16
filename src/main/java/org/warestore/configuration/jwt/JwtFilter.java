@@ -36,7 +36,7 @@ public class JwtFilter extends GenericFilterBean {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         String appVerificationCode = getAppVerificationCodeFromRequest((HttpServletRequest)servletRequest);
         if (validateApplication(appVerificationCode)) {
-            String token = getTokenFromRequest((HttpServletRequest) servletRequest);
+            String token = jwtProvider.getTokenFromRequest((HttpServletRequest) servletRequest);
             if (token != null) {
                 if (jwtProvider.validateJWT(token)) {
                     log.info("The filter passes the request.");
@@ -51,17 +51,6 @@ public class JwtFilter extends GenericFilterBean {
         }
         else
             ((HttpServletResponse) servletResponse).sendError(401);
-    }
-
-    private String getTokenFromRequest(HttpServletRequest request){
-        String bearer = request.getHeader("Authorization");
-        if (bearer!=null){
-            bearer = bearer.replaceAll(" ","");
-            if (bearer.startsWith("Bearer")){
-                return bearer.substring(6);
-            }
-        }
-        return null;
     }
 
     private String getAppVerificationCodeFromRequest(HttpServletRequest request){

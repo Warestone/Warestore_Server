@@ -4,6 +4,8 @@ import io.jsonwebtoken.*;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -14,6 +16,17 @@ public class JwtProvider {
 
     @Value("$(jwt.secret)")
     private String jwtSecret;
+
+    public String getTokenFromRequest(HttpServletRequest request){
+        String bearer = request.getHeader("Authorization");
+        if (bearer!=null){
+            bearer = bearer.replaceAll(" ","");
+            if (bearer.startsWith("Bearer")){
+                return bearer.substring(6);
+            }
+        }
+        return null;
+    }
 
     public String generateToken(String username){
         Date date = Date.from(LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
