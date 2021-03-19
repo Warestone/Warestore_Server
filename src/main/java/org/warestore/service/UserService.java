@@ -69,7 +69,6 @@ public class UserService {
                 "("+idUser+","+Attributes.EMAIL.ordinal()+",'"+user.getEmail()+"')," +
                 "("+idUser+","+Attributes.PHONE_NUMBER.ordinal()+",'"+user.getPhoneNumber()+"')," +
                 "("+idUser+","+Attributes.ADDRESS.ordinal()+",'"+user.getAddress()+"')");
-
         return true;
     }
 }
