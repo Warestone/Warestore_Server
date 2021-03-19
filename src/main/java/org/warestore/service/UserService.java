@@ -29,7 +29,7 @@ public class UserService {
     public ResponseEntity<?> getUserByName(String username){
         Pattern pattern = Pattern.compile("[a-z0-9A-Z]{5,20}");
         Matcher matcher = pattern.matcher(username);
-        if (!matcher.find()) return null;
+        if (!matcher.find()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         log.info("Return user "+username+" by username.");
         List<User> users =  jdbcTemplate.query("select usr.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param \n" +
                 "where usr.object_id = obj.id and param.object_id = obj.id and obj.name = '"+username+"'",
@@ -52,7 +52,6 @@ public class UserService {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    //need test, but sure
     @Transactional
     public boolean saveUser(UserRegistration user){
         if (getUserByName(user.getUsername()).getStatusCode()==HttpStatus.OK) return false;
