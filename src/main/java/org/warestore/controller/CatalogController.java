@@ -1,17 +1,14 @@
 package org.warestore.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.warestore.model.Ammo;
-import org.warestore.model.Category;
-import org.warestore.model.Target;
-import org.warestore.model.Weapon;
+import org.springframework.web.bind.annotation.*;
+import org.warestore.model.*;
 import org.warestore.service.CatalogService;
-import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(value = "/server/catalog")
@@ -37,4 +34,10 @@ public class CatalogController {
 
     @GetMapping(value = "/get/target_page/{id}")
     public ResponseEntity<?> getTargetsPage(@PathVariable int id){ return catalogService.getTargetPage(id); }
+
+    @PostMapping(value = "/post/order", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> makeNewOrder(@RequestBody HashMap<Integer, Item> cart, HttpServletRequest request){
+        Token token = new Token(request.getHeader("Authorization"));
+        return catalogService.createOrder(cart, token);
+    }
 }

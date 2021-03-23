@@ -30,7 +30,7 @@ public class UserService {
         Pattern pattern = Pattern.compile("[a-z0-9A-Z]{5,20}");
         Matcher matcher = pattern.matcher(username);
         if (!matcher.find()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        log.info("Return user "+username+" by username.");
+        log.info("Return user '"+username+"' by username.");
         List<User> users =  jdbcTemplate.query("select usr.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param \n" +
                 "where usr.object_id = obj.id and param.object_id = obj.id and obj.name = '"+username+"'",
                 new UserMapper());
@@ -39,7 +39,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> getUserByNameAndPassword(String username, String password){
-        log.info("Return user "+username+" by username & password.");
+        log.info("Return user '"+username+"' by username & password.");
         ResponseEntity<?> response = getUserByName(username);
         if (response.getStatusCode()==HttpStatus.OK){
             User user = (User) response.getBody();
@@ -55,7 +55,7 @@ public class UserService {
     @Transactional
     public boolean saveUser(UserRegistration user){
         if (getUserByName(user.getUsername()).getStatusCode()==HttpStatus.OK) return false;
-        log.info("Save user "+user.getUsername()+".");
+        log.info("Save user '"+user.getUsername()+"'.");
         jdbcTemplate.update("insert into objects (name, type_id) values " +
                 "('"+user.getUsername()+"',"+Types.USER.ordinal()+")");
 

@@ -19,6 +19,12 @@ public class UserMapper implements RowMapper<User> {
         user.setPhoneNumber(resultSet.getString("value"));
         resultSet.next();
         user.setAddress(resultSet.getString("value"));
+        resultSet.next();
+        user.setFirstName(resultSet.getString("value"));
+        resultSet.next();
+        user.setLastName(resultSet.getString("value"));
+        resultSet.next();
+        user.setPatronymicName(resultSet.getString("value"));
         return user;
     }
 }

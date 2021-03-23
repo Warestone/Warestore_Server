@@ -14,6 +14,18 @@ public class UserRegistration {
     private String password;
 
     @NotEmpty
+    @Pattern(regexp = "[А-Я][а-я]{1,20}")
+    private String firstName;
+
+    @NotEmpty
+    @Pattern(regexp = "[А-Я][а-я]{5,20}")
+    private String lastName;
+
+    @NotEmpty
+    @Pattern(regexp = "[А-Я][а-я]{5,20}")
+    private String patronymicName;
+
+    @NotEmpty
     @Pattern(regexp = "[a-z0-9\\\\.]{3,200}@[a-z0-9]{3,20}.?[a-z]{2,20}?")
     private String email;
 
