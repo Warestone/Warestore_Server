@@ -10,14 +10,14 @@ public class WeaponMapper implements RowMapper<Weapon> {
     public Weapon mapRow(ResultSet resultSet, int i) throws SQLException {
         Weapon weapon = new Weapon();
         weapon.setId(resultSet.getInt("id"));
-        weapon.setPrice(resultSet.getDouble("value"));
         weapon.setName(resultSet.getString("name"));
+        weapon.setCaliber(resultSet.getString("value"));
         resultSet.next();
         weapon.setDescription(resultSet.getString("value"));
         resultSet.next();
-        weapon.setQuantity(resultSet.getInt("value"));
+        weapon.setPrice(resultSet.getDouble("value"));
         resultSet.next();
-        weapon.setCaliber(resultSet.getString("value"));
+        weapon.setQuantity(resultSet.getInt("value"));
         return weapon;
     }
 }

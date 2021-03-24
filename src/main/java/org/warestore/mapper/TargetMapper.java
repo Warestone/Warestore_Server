@@ -10,10 +10,10 @@ public class TargetMapper implements RowMapper<Target> {
     public Target mapRow(ResultSet resultSet, int i) throws SQLException {
         Target target = new Target();
         target.setId(resultSet.getInt("id"));
-        target.setPrice(resultSet.getDouble("value"));
         target.setName(resultSet.getString("name"));
-        resultSet.next();
         target.setDescription(resultSet.getString("value"));
+        resultSet.next();
+        target.setPrice(resultSet.getDouble("value"));
         resultSet.next();
         target.setQuantity(resultSet.getInt("value"));
         resultSet.next();

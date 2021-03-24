@@ -58,11 +58,9 @@ create table users (
 
 create table links (
 	id serial not null primary key,
-	attribute_id integer not null,
 	object_id integer not null,
 	reference_obj_id integer,
-	UNIQUE(attribute_id, object_id,reference_obj_id),
-	FOREIGN KEY (attribute_id) REFERENCES attributes (id) ON DELETE CASCADE,
+	UNIQUE(object_id, reference_obj_id),
 	FOREIGN KEY (object_id) REFERENCES objects (id) ON DELETE CASCADE,
 	FOREIGN KEY (reference_obj_id) REFERENCES objects (id) ON DELETE CASCADE
 )
@@ -83,7 +81,8 @@ insert into attributes (name) values
 ('email'),('phone_number'),('role'),('address'),
 ('price'),('location'),('items'),('product'),('user_id'),
 ('description'),('product_type'),('quantity'),('caliber'),
-('url'),('rounds'),('size'),('first_name'),('last_name'),('patronymic_name');
+('url'),('rounds'),('size'),('first_name'),('last_name'),
+('patronymic_name'),('date'),('status');
 
 
 
@@ -96,7 +95,8 @@ insert into attribute_type (type_id, attribute_id) values
 (9,13)											// shotgun
 (10,13),										// airgun
 (11,16),(11,13),								// ammo
-(12,17)											// target
+(12,17),										// target
+(5,12),(5,5),(5,22),(5,23)						// order
 
 
 
@@ -263,6 +263,29 @@ insert into parameters (object_id, attribute_id, value) values
 (75,5,'3.00'),(75,10,'Кусок бумаги и краски 9, чтобы было по чему стрелять.'),(75,11,'12'),(75,12,'0'),(75,17,'50х50 см.')
 
 
+
+
+//insert order (example)
+insert into objects (name, type_id) values
+('№'||(select count(id)+1 as current_order from objects where type_id = 5),5)
+
+//insert order params
+insert into parameters (object_id, attribute_id, value) values
+(82,12,'1'),(82,5,'22000.0'),(82,22,'24.03.2021'),(82,23,'выполнен')
+
+//insert link between user & his order
+insert into links (object_id, reference_obj_id, type_id) values
+(82,79,1)
+
+//update product quantity in warehouse
+update parameters set value = '11' WHERE object_id = 9 and attribute_id = 12
+
+//get all orders of this user
+select obj.id, obj.name, attr.name as type, param.value, (select obj2.name from objects obj2, links ls2
+where ls2.object_id = obj.id and obj2.id = ls2.reference_obj_id and ls2.type_id = 3) as product_name from objects obj, attributes attr, parameters param, links ls
+where ls.object_id = obj.id and param.object_id = obj.id and param.attribute_id = attr.id and obj.type_id = 5 and ls.reference_obj_id = 79
+
+
 //END
 
 //GETTERS
@@ -270,9 +293,6 @@ insert into parameters (object_id, attribute_id, value) values
 select obj.name, param.value as url from objects obj, attributes attr, parameters param
 where param.object_id = obj.id and param.attribute_id = attr.id and obj.type_id = 6
 
-//Get attributes at types
-select tp.id as type_id, tp.name as type_name, attr.id as attribute_id, attr.name as attribute_name from attribute_type at, types tp, attributes attr
-where at.attribute_id = attr.id and at.type_id = tp.id
 
 //Get all rifles
 select obj.id, obj.name, attr.name as type, param.value from objects obj, attributes attr, parameters param
@@ -307,3 +327,7 @@ where attr.id = at.attribute_id and tp.id = at.type_id order by type_name desc
 //Get user credentials
 select usr.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param 
 where usr.object_id = obj.id and param.object_id = obj.id
+
+//Get all orders (objects)
+select obj.id, obj.name, attr.name as type, param.value from objects obj, attributes attr, parameters param
+where param.object_id = obj.id and param.attribute_id = attr.id and obj.type_id = 5

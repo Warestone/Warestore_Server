@@ -17,5 +17,10 @@ public enum Attributes {
     CALIBER,
     URL,
     ROUNDS,
-    SIZE
+    SIZE,
+    FIRST_NAME,
+    LAST_NAME,
+    PATRONYMIC_NAME,
+    DATE,
+    STATUS
 }

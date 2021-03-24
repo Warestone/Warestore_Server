@@ -1,5 +1,6 @@
 package org.warestore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import javax.validation.constraints.*;
 
@@ -40,4 +41,7 @@ public class User {
     @NotEmpty
     @Size(min = 10, max = 50)
     private String address;
+
+    @JsonIgnore
+    public String getFIO(){ return lastName+" "+firstName+" "+patronymicName; }
 }

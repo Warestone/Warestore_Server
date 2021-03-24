@@ -10,13 +10,10 @@ public class ProductMapper implements RowMapper<Product> {
     public Product mapRow(ResultSet resultSet, int i) throws SQLException {
         Product product = new Product();
         product.setId(resultSet.getInt("id"));
-        product.setPrice(resultSet.getDouble("value"));
         product.setName(resultSet.getString("name"));
-        resultSet.next();
+        product.setPrice(resultSet.getDouble("value"));
         resultSet.next();
         product.setQuantity(resultSet.getInt("value"));
-        resultSet.next();
-        resultSet.next();
         return product;
     }
 }

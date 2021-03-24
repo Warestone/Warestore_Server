@@ -34,8 +34,8 @@ public class MailService {
 
         message.append("Спасибо за покупку в магазине Warestore! Ребята с Grove Street выражают respect+");
         message.append("\n\nИнформация о заказе:");
-        message.append("\n\tДата заказа: ").append(new SimpleDateFormat("E yyyy.MM.dd ', время ' hh:mm:ss a").format(new Date()));
-        message.append("\n\tПолучатель: "+"FIO"); // add FIO to database, models & UI in registration
+        message.append("\n\tДата заказа: ").append(new SimpleDateFormat("yyyy.MM.dd ', время ' hh:mm:ss a").format(new Date()));
+        message.append("\n\tПолучатель: "+user.getFIO()); // add FIO to database, models & UI in registration
         message.append("\n\tАдрес доставки: ").append(user.getAddress());
         message.append("\n\tОбщая сумма заказа: ").append(orderSum).append("₽");
         message.append("\n\tКупленные товары:\n");
@@ -43,9 +43,9 @@ public class MailService {
         for(Item founded:cart.values()){
             message.append("\n\t\t").append(counter+=1).append(") ");
             message.append("Наименование: ").append(founded.getName());
-            message.append("\n\t\t  Количество: ").append(founded.getQuantity());
-            message.append("\n\t\t  Цена за шт.: ").append(founded.getPrice()).append("₽");
-            message.append("\n\t\t  Общая цена: ").append((Double)(founded.getPrice() + founded.getQuantity())).append("₽");
+            message.append("\n\t\t     Количество: ").append(founded.getQuantity());
+            message.append("\n\t\t     Цена за шт.: ").append(founded.getPrice()).append("₽");
+            message.append("\n\t\t     Общая цена: ").append((Double)(founded.getPrice() * founded.getQuantity())).append("₽");
             message.append("\n\n");
         }
         message.append("\n\nПожалуйста, не отвечайте на это письмо, оно было сгенерировано автоматически!");
