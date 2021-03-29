@@ -29,6 +29,11 @@ public class UserController {
                         jwtProvider.getTokenFromRequest(request)));
     }
 
+    @GetMapping("/get/order_page/{page}")
+    public ResponseEntity<?> getUserOrders(HttpServletRequest request, @PathVariable int page){
+        return userService.getOrdersByUsername(request, page);
+    }
+
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistration userRegistration){
         boolean register = userService.saveUser(userRegistration);

@@ -8,9 +8,4 @@ import lombok.Data;
 @AllArgsConstructor
 public class Token {
     private String token;
-
-    @JsonIgnore
-    public String getTokenWithoutBearer(){
-        return token.replace(" ","").replace("Bearer","");
-    }
 }

@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.warestore.model.*;
 import org.warestore.service.CatalogService;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
@@ -20,24 +19,23 @@ public class CatalogController {
     @GetMapping(value = "/get/category")
     public ResponseEntity<?> getCategories(){ return catalogService.getCategories(); }
 
-    @GetMapping(value = "/get/rifle_page/{id}")
-    public ResponseEntity<?> getRiflesPage(@PathVariable int id){ return catalogService.getRiflesPage(id); }
+    @GetMapping(value = "/get/rifle_page/{page}")
+    public ResponseEntity<?> getRiflesPage(@PathVariable int page){ return catalogService.getRiflesPage(page); }
 
-    @GetMapping(value = "/get/shotgun_page/{id}")
-    public ResponseEntity<?> getShotgunsPage(@PathVariable int id){ return catalogService.getShotgunsPage(id); }
+    @GetMapping(value = "/get/shotgun_page/{page}")
+    public ResponseEntity<?> getShotgunsPage(@PathVariable int page){ return catalogService.getShotgunsPage(page); }
 
-    @GetMapping(value = "/get/airgun_page/{id}")
-    public ResponseEntity<?> getAirgunsPage(@PathVariable int id){ return catalogService.getAirgunsPage(id); }
+    @GetMapping(value = "/get/airgun_page/{page}")
+    public ResponseEntity<?> getAirgunsPage(@PathVariable int page){ return catalogService.getAirgunsPage(page); }
 
-    @GetMapping(value = "/get/ammo_page/{id}")
-    public ResponseEntity<?> getAmmoPage(@PathVariable int id){ return catalogService.getAmmoPage(id); }
+    @GetMapping(value = "/get/ammo_page/{page}")
+    public ResponseEntity<?> getAmmoPage(@PathVariable int page){ return catalogService.getAmmoPage(page); }
 
-    @GetMapping(value = "/get/target_page/{id}")
-    public ResponseEntity<?> getTargetsPage(@PathVariable int id){ return catalogService.getTargetPage(id); }
+    @GetMapping(value = "/get/target_page/{page}")
+    public ResponseEntity<?> getTargetsPage(@PathVariable int page){ return catalogService.getTargetPage(page); }
 
     @PostMapping(value = "/post/order", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> makeNewOrder(@RequestBody HashMap<Integer, Item> cart, HttpServletRequest request){
-        Token token = new Token(request.getHeader("Authorization"));
-        return catalogService.createOrder(cart, token);
+        return catalogService.createOrder(cart, request);
     }
 }

@@ -13,6 +13,8 @@ import org.warestore.model.*;
 import org.warestore.service.enums.Attributes;
 import org.warestore.service.enums.Categories;
 import org.warestore.service.enums.Types;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -80,9 +82,9 @@ public class CatalogService {
                 new TargetMapper(),20), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> createOrder(HashMap<Integer, Item> cart, Token token){
+    public ResponseEntity<?> createOrder(HashMap<Integer, Item> cart, HttpServletRequest request){
         ResponseEntity<?> response = userService.getUserByName(
-                jwtProvider.getUsernameFromToken(token.getTokenWithoutBearer()));
+                jwtProvider.getUsernameFromToken(jwtProvider.getTokenFromRequest(request)));
         if (response.getStatusCode()!=HttpStatus.NOT_FOUND){
             User user = (User) response.getBody();
             assert user != null;
@@ -107,7 +109,7 @@ public class CatalogService {
         else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    private List<?> getData(int page, int typeId, RowMapper rowMapper, int limit){
+    private List<?> getData(int page, int typeId, RowMapper<?> rowMapper, int limit){
         return jdbcTemplate.query(GET_WEAPON_OR_AMMO_PAGE_QUERY_PART1 +typeId+
                 GET_WEAPON_OR_AMMO_PAGE_QUERY_PART2 +limit+" offset "+limit*page, rowMapper);
     }

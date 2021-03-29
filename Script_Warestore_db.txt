@@ -281,9 +281,11 @@ insert into links (object_id, reference_obj_id, type_id) values
 update parameters set value = '11' WHERE object_id = 9 and attribute_id = 12
 
 //get all orders of this user
-select obj.id, obj.name, attr.name as type, param.value, (select obj2.name from objects obj2, links ls2
-where ls2.object_id = obj.id and obj2.id = ls2.reference_obj_id and ls2.type_id = 3) as product_name from objects obj, attributes attr, parameters param, links ls
-where ls.object_id = obj.id and param.object_id = obj.id and param.attribute_id = attr.id and obj.type_id = 5 and ls.reference_obj_id = 79
+select obj.id, obj.name, obj2.name as product_name, obj3.name as username, attr.name as type, param.value 
+from objects obj, objects obj2, objects obj3, attributes attr, parameters param, links ls, links ls2 
+where ls2.object_id = obj.id and obj2.id = ls2.reference_obj_id and ls2.type_id = 3 
+and ls.object_id = obj.id and param.object_id = obj.id and param.attribute_id = attr.id 
+and obj.type_id = 5 and obj3.id = ls.reference_obj_id and obj3.type_id=1 and ls.reference_obj_id = 79 order by id, type
 
 
 //END
@@ -328,6 +330,9 @@ where attr.id = at.attribute_id and tp.id = at.type_id order by type_name desc
 select usr.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param 
 where usr.object_id = obj.id and param.object_id = obj.id
 
-//Get all orders (objects)
-select obj.id, obj.name, attr.name as type, param.value from objects obj, attributes attr, parameters param
-where param.object_id = obj.id and param.attribute_id = attr.id and obj.type_id = 5
+//Get all orders
+select obj.id, obj.name, obj2.name as product_name, obj3.name as username, attr.name as type, param.value 
+from objects obj, objects obj2, objects obj3, attributes attr, parameters param, links ls, links ls2 
+where ls2.object_id = obj.id and obj2.id = ls2.reference_obj_id and ls2.type_id = 3 
+and ls.object_id = obj.id and param.object_id = obj.id and param.attribute_id = attr.id 
+and obj.type_id = 5 and obj3.id = ls.reference_obj_id and obj3.type_id=1 order by id, type

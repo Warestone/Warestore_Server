@@ -7,12 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.warestore.configuration.jwt.JwtProvider;
+import org.warestore.mapper.OrderMapper;
 import org.warestore.mapper.UserMapper;
+import org.warestore.model.Order;
 import org.warestore.model.User;
 import org.warestore.model.UserRegistration;
 import org.warestore.service.enums.Attributes;
 import org.warestore.service.enums.Types;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -24,8 +27,12 @@ public class UserService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     public ResponseEntity<?> getUserByName(String username){
         Pattern pattern = Pattern.compile("[a-z0-9A-Z]{5,20}");
@@ -74,5 +81,21 @@ public class UserService {
                 "("+idUser+","+Attributes.PATRONYMIC_NAME.ordinal()+",'"+user.getPatronymicName()+"')"
         );
         return true;
+    }
+
+    public ResponseEntity<?>getOrdersByUsername(HttpServletRequest request, int page){
+        ResponseEntity<?> response = getUserByName(
+                jwtProvider.getUsernameFromToken(
+                jwtProvider.getTokenFromRequest(request)));
+        if (response.getStatusCode()!=HttpStatus.OK)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        User user = (User) response.getBody();
+        List<Order> ordersList = jdbcTemplate.query("select obj.id, obj.name, obj2.name as product_name, obj3.name as username, attr.name as type, param.value " +
+                "from objects obj, objects obj2, objects obj3, attributes attr, parameters param, links ls, links ls2 " +
+                "where ls2.object_id = obj.id and obj2.id = ls2.reference_obj_id and ls2.type_id = 3 " +
+                "and ls.object_id = obj.id and param.object_id = obj.id and param.attribute_id = attr.id " +
+                "and obj.type_id = 5 and obj3.id = ls.reference_obj_id and obj3.type_id=1 and ls.reference_obj_id = "+user.getId()+" order by id, type limit 20 offset "+page*20, new OrderMapper());
+
+        return new ResponseEntity<>(ordersList, HttpStatus.OK);
     }
 }
