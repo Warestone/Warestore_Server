@@ -91,9 +91,9 @@ public class CatalogService {
             for(Item item:cart.values()){ // check quantity of products in cart
                 Product product = getProduct(item.getId()).get(0);
                 if (product==null)
-                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
                 else if (product.getQuantity()<item.getQuantity())
-                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
                 item.setQtyInWarehouse(product.getQuantity());
             }
             String orderNo="";
@@ -102,8 +102,8 @@ public class CatalogService {
 
             log.info("Sending message (order) to user '"+user.getUsername()+"'.");
             mailService.sendMessage(
-                    "jontimofeev@yandex.ru","Заказ WARESTORE "+orderNo,
-                    mailService.compileMessage(cart, user));
+                    user.getEmail(),"Заказ WARESTORE "+orderNo,
+                    mailService.compileOrderMessage(cart, user));
             return new ResponseEntity<>(HttpStatus.OK);
         }
         else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -119,7 +119,7 @@ public class CatalogService {
                 "where param.object_id = obj.id and param.attribute_id = attr.id and attr.name in('price','quantity') and obj.id = "+id +" order by id, type", new ProductMapper());
     }
 
-    @Transactional //annotation not working
+    @Transactional
     protected String insertOrderAndUpdateProductQuantity(Item item, User user){
         //get new order name ('№' + last object with type = 'order' + 1)
         String nameOrder = "№"+jdbcTemplate.queryForObject("select count(id)+1 as current_order from objects where type_id = 5", String.class);
@@ -141,7 +141,6 @@ public class CatalogService {
                 "("+idOrder+","+user.getId()+","+Types.USER.ordinal()+"),"+
                 "("+idOrder+","+item.getId()+","+Types.ITEM.ordinal()+")"
         );
-
         return nameOrder;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.warestore.configuration.jwt.JwtProvider;
 import org.warestore.mapper.OrderMapper;
 import org.warestore.mapper.UserMapper;
+import org.warestore.model.EditPassword;
 import org.warestore.model.Order;
 import org.warestore.model.User;
 import org.warestore.model.UserRegistration;
@@ -34,13 +35,16 @@ public class UserService {
     @Autowired
     private JwtProvider jwtProvider;
 
+    @Autowired
+    private MailService mailService;
+
     public ResponseEntity<?> getUserByName(String username){
         Pattern pattern = Pattern.compile("[a-z0-9A-Z]{5,20}");
         Matcher matcher = pattern.matcher(username);
         if (!matcher.find()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         log.info("Return user '"+username+"' by username.");
-        List<User> users =  jdbcTemplate.query("select obj.id as id, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param \n" +
-                "where usr.object_id = obj.id and param.object_id = obj.id and obj.name = '"+username+"'",
+        List<User> users =  jdbcTemplate.query("select obj.id as id, param.attribute_id as atrrid, obj.name as username, usr.password as password, param.value from users usr, objects obj, parameters param \n" +
+                        "where usr.object_id = obj.id and param.object_id = obj.id and obj.name = '"+username+"'  order by atrrid",
                 new UserMapper());
         if (users.size()==0)return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else return new ResponseEntity<>(users.get(0), HttpStatus.OK);
@@ -53,14 +57,74 @@ public class UserService {
             User user = (User) response.getBody();
             if (user!=null){
                 if (passwordEncoder.matches(password, user.getPassword()))
-                    return new ResponseEntity<>(HttpStatus.OK);
+                    return new ResponseEntity<>(user, HttpStatus.OK);
                 else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @Transactional //annotation not working
+    @Transactional
+    public boolean updateInfo(UserRegistration userIn){
+        ResponseEntity<?> response = getUserByName(userIn.getUsername());
+        if (response.getStatusCode()!=HttpStatus.OK) return false;
+        User user = (User) response.getBody();
+        assert user != null;
+        log.info("Update user info by username '"+user.getUsername()+"'.");
+        //update parameters set value = 'Драгунов' where attribute_id = 20 and object_id = 76
+        if (!userIn.getFirstName().equals(user.getFirstName()))
+            jdbcTemplate.update(
+                    "update parameters set value = '"+userIn.getFirstName()+
+                            "' where attribute_id = "+(Attributes.FIRST_NAME.ordinal()+2)+
+                            " and object_id = "+user.getId());
+        if (!userIn.getLastName().equals(user.getLastName()))
+            jdbcTemplate.update(
+                    "update parameters set value = '"+userIn.getLastName()+
+                            "' where attribute_id = "+(Attributes.LAST_NAME.ordinal()+2)+
+                            " and object_id = "+user.getId());
+        if (!userIn.getPatronymicName().equals(user.getPatronymicName()))
+            jdbcTemplate.update(
+                    "update parameters set value = '"+userIn.getPatronymicName()+
+                            "' where attribute_id = "+(Attributes.PATRONYMIC_NAME.ordinal()+2)+
+                            " and object_id = "+user.getId());
+        if (!userIn.getPhoneNumber().equals(user.getPhoneNumber()))
+            jdbcTemplate.update(
+                    "update parameters set value = '"+userIn.getPhoneNumber()+
+                            "' where attribute_id = "+Attributes.PHONE_NUMBER.ordinal()+
+                            " and object_id = "+user.getId());
+        if (!userIn.getAddress().equals(user.getAddress()))
+            jdbcTemplate.update(
+                    "update parameters set value = '"+userIn.getAddress()+
+                            "' where attribute_id = "+Attributes.ADDRESS.ordinal()+
+                            " and object_id = "+user.getId());
+        if (!userIn.getEmail().equals(user.getEmail()))
+            jdbcTemplate.update(
+                    "update parameters set value = '"+userIn.getEmail()+
+                            "' where attribute_id = "+Attributes.EMAIL.ordinal()+
+                            " and object_id = "+user.getId());
+        return true;
+    }
+
+    public boolean updatePassword(EditPassword editPassword, HttpServletRequest request){
+        ResponseEntity<?> response = getUserByNameAndPassword(
+                jwtProvider.getUsernameFromToken(jwtProvider.getTokenFromRequest(request)),
+                editPassword.getCurrentPassword()
+        );
+        if (response.getStatusCode()!=HttpStatus.OK)
+            return false;
+        User user = (User) response.getBody();
+        assert user != null;
+        log.info("Update user password by username '"+user.getUsername()+"'.");
+        jdbcTemplate.update(
+                "update users set password = '"+passwordEncoder.encode(editPassword.getNewPassword())+
+                        "' where object_id = "+user.getId());
+        log.info("Sending message (new password) to user '"+user.getUsername()+"'.");
+        mailService.sendMessage(user.getEmail(),"Новый пароль в WARESTORE",
+                mailService.compileNewPasswordMessage(user));
+        return true;
+    }
+
+    @Transactional
     public boolean saveUser(UserRegistration user){
         if (getUserByName(user.getUsername()).getStatusCode()==HttpStatus.OK) return false;
         log.info("Save user '"+user.getUsername()+"'.");
@@ -76,9 +140,10 @@ public class UserService {
                 "("+idUser+","+Attributes.ROLE.ordinal()+",'ROLE_USER')," +
                 "("+idUser+","+Attributes.EMAIL.ordinal()+",'"+user.getEmail()+"')," +
                 "("+idUser+","+Attributes.PHONE_NUMBER.ordinal()+",'"+user.getPhoneNumber()+"')," +
-                "("+idUser+","+Attributes.FIRST_NAME.ordinal()+",'"+user.getFirstName()+"')," +
-                "("+idUser+","+Attributes.LAST_NAME.ordinal()+",'"+user.getLastName()+"')," +
-                "("+idUser+","+Attributes.PATRONYMIC_NAME.ordinal()+",'"+user.getPatronymicName()+"')"
+                "("+idUser+","+(Attributes.FIRST_NAME.ordinal()+2)+",'"+user.getFirstName()+"')," +
+                "("+idUser+","+(Attributes.LAST_NAME.ordinal()+2)+",'"+user.getLastName()+"')," +
+                "("+idUser+","+(Attributes.PATRONYMIC_NAME.ordinal()+2)+",'"+user.getPatronymicName()+"'),"+
+                "("+idUser+","+Attributes.ADDRESS.ordinal()+",'"+user.getAddress()+"')"
         );
         return true;
     }

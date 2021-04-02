@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.warestore.configuration.jwt.JwtProvider;
+import org.warestore.model.EditPassword;
 import org.warestore.model.Token;
 import org.warestore.model.UserAuthentication;
 import org.warestore.model.UserRegistration;
@@ -24,30 +25,74 @@ public class UserController {
 
     @GetMapping(value = "/get")
     public ResponseEntity<?> getUserByUsername(HttpServletRequest request){
-        return userService.getUserByName(
-                jwtProvider.getUsernameFromToken(
-                        jwtProvider.getTokenFromRequest(request)));
+        try {
+            return userService.getUserByName(
+                    jwtProvider.getUsernameFromToken(
+                            jwtProvider.getTokenFromRequest(request)));
+        }
+        catch (Exception ignored){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("/get/order_page/{page}")
     public ResponseEntity<?> getUserOrders(HttpServletRequest request, @PathVariable int page){
-        return userService.getOrdersByUsername(request, page);
+        try{
+            return userService.getOrdersByUsername(request, page);
+        }
+        catch (Exception ignored){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistration userRegistration){
-        boolean register = userService.saveUser(userRegistration);
-        if (!register) new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        return authUser(new UserAuthentication(userRegistration.getUsername(),
-                userRegistration.getPassword()));
+        try {
+            boolean register = userService.saveUser(userRegistration);
+            if (!register) return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            else return authUser(new UserAuthentication(userRegistration.getUsername(),
+                    userRegistration.getPassword()));
+        }
+        catch (Exception ignored){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
     @PostMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authUser(@RequestBody @Valid UserAuthentication userAuthentication){
-        ResponseEntity<?> response = userService.getUserByNameAndPassword(userAuthentication.getUsername(),
-                userAuthentication.getPassword());
-        if (response.getStatusCode()!=HttpStatus.OK) return response;
-        else return new ResponseEntity<>(new Token(jwtProvider.generateToken(userAuthentication.getUsername())),
-                HttpStatus.OK);
+        try{
+            ResponseEntity<?> response = userService.getUserByNameAndPassword(userAuthentication.getUsername(),
+                    userAuthentication.getPassword());
+            if (response.getStatusCode()!=HttpStatus.OK) return response;
+            else return new ResponseEntity<>(new Token(jwtProvider.generateToken(userAuthentication.getUsername())),
+                    HttpStatus.OK);
+        }
+        catch (Exception ignored){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+    }
+
+    @PostMapping(value = "/post/info", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateUserInfo(@RequestBody @Valid UserRegistration user){
+        try{
+            boolean editInfo = userService.updateInfo(user);
+            if (!editInfo) return new ResponseEntity<>(HttpStatus.CONFLICT);
+            else return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception ignored){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+    }
+
+    @PostMapping(value = "/post/password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateUserPassword(@RequestBody @Valid EditPassword editPasswordIn, HttpServletRequest request){
+        try{
+            boolean editPassword = userService.updatePassword(editPasswordIn, request);
+            if (!editPassword) return new ResponseEntity<>(HttpStatus.CONFLICT);
+            else return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception ignored){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 }

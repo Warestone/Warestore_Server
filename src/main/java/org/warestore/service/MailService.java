@@ -25,7 +25,16 @@ public class MailService {
         emailSender.send(message);
     }
 
-    public String compileMessage(HashMap<Integer, Item> cart, User user){
+    public String compileNewPasswordMessage(User user){
+        StringBuffer message = new StringBuffer();
+        message.append("В Вашем профиле под логином '"+user.getUsername()+"' зарегистрировано изменение пароля.")
+                .append("\nДата изменения: ").append(new SimpleDateFormat("yyyy.MM.dd ', время ' hh:mm:ss a").format(new Date()))
+                .append("\nЕсли это были не Вы, пожалуйста, свяжитесь с администратором магазина WARESTORE!")
+                .append("\n\nС Уважением, оружейный магазин 'WARESTORE'.");
+        return message.toString();
+    }
+
+    public String compileOrderMessage(HashMap<Integer, Item> cart, User user){
         StringBuffer message = new StringBuffer();
         double orderSum=0.0;
         if (cart.size()!=0)
@@ -49,7 +58,7 @@ public class MailService {
             message.append("\n\n");
         }
         message.append("\n\nПожалуйста, не отвечайте на это письмо, оно было сгенерировано автоматически!");
-        message.append("\nС Уважением, оружейеный магазин 'WARESTORE'.");
+        message.append("\nС Уважением, оружейный магазин 'WARESTORE'.");
         return message.toString();
     }
 }
