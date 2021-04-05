@@ -10,10 +10,10 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class UserAuthentication {
     @NotEmpty
-    @Pattern(regexp = "[a-z][a-z0-9]{4,20}")
+    @Pattern(regexp = "[a-z][a-z0-9]{3,20}")
     private String username;
 
     @NotEmpty
-    @Size(min = 5, max = 12)
+    @Size(min = 4, max = 12)
     private String password;
 }

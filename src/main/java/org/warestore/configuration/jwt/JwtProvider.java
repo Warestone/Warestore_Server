@@ -2,9 +2,9 @@ package org.warestore.configuration.jwt;
 
 import io.jsonwebtoken.*;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -14,8 +14,8 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    @Value("$(jwt.secret)")
-    private String jwtSecret;
+    @Autowired
+    Environment environment;
 
     public String getTokenFromRequest(HttpServletRequest request){
         String bearer = request.getHeader("Authorization");
@@ -33,13 +33,13 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(username)
                 .setExpiration(date)
-                .signWith(SignatureAlgorithm.HS512,jwtSecret)
+                .signWith(SignatureAlgorithm.HS512,environment.getProperty("jwt.secret"))
                 .compact();
     }
 
     public boolean validateJWT(String token){
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(environment.getProperty("jwt.secret")).parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             log.warning("Invalid token.");
@@ -48,7 +48,7 @@ public class JwtProvider {
     }
 
     public String getUsernameFromToken(String token){
-        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().setSigningKey(environment.getProperty("jwt.secret")).parseClaimsJws(token).getBody();
         return claims.getSubject();
     }
 }

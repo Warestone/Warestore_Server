@@ -6,19 +6,19 @@ import javax.validation.constraints.*;
 @Data
 public class UserRegistration {
     @NotEmpty
-    @Pattern(regexp = "[a-z][a-z0-9]{4,20}")
+    @Pattern(regexp = "[a-z][a-z0-9]{3,20}")
     private String username;
 
     @NotEmpty
-    @Size(min = 5, max = 12)
+    @Size(min = 4, max = 12)
     private String password;
 
     @NotEmpty
-    @Pattern(regexp = "[А-Я][а-я]{1,20}")
+    @Pattern(regexp = "[А-Я][а-я]{3,20}")
     private String firstName;
 
     @NotEmpty
-    @Pattern(regexp = "[А-Я][а-я]{5,20}")
+    @Pattern(regexp = "[А-Я][а-я]{3,20}")
     private String lastName;
 
     @NotEmpty

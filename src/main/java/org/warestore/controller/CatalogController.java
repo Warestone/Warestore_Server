@@ -13,7 +13,6 @@ import java.util.HashMap;
 @RestController
 @RequestMapping(value = "/server/catalog")
 public class CatalogController {
-
     @Autowired
     private CatalogService catalogService;
 
