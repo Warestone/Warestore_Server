@@ -48,8 +48,9 @@ public class UserController {
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistration userRegistration){
         try {
-            boolean register = userService.saveUser(userRegistration);
-            if (!register) return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            ResponseEntity<?> register = userService.saveUser(userRegistration);
+            if (register.getStatusCode()!=HttpStatus.OK) return register;
+
             else return authUser(new UserAuthentication(userRegistration.getUsername(),
                     userRegistration.getPassword()));
         }
@@ -75,9 +76,7 @@ public class UserController {
     @PostMapping(value = "/post/info", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateUserInfo(@RequestBody @Valid UserRegistration user){
         try{
-            boolean editInfo = userService.updateInfo(user);
-            if (!editInfo) return new ResponseEntity<>(HttpStatus.CONFLICT);
-            else return new ResponseEntity<>(HttpStatus.OK);
+            return userService.updateInfo(user);
         }
         catch (Exception ignored){
             return new ResponseEntity<>(HttpStatus.CONFLICT);

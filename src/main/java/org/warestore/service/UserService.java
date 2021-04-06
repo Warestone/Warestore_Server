@@ -67,10 +67,15 @@ public class UserService {
     }
 
     @Transactional
-    public boolean updateInfo(UserRegistration userIn){
-        ResponseEntity<?> response = getUserByName(userIn.getUsername());
-        if (response.getStatusCode()!=HttpStatus.OK) return false;
-        User user = (User) response.getBody();
+    public ResponseEntity<?> updateInfo(UserRegistration userIn){
+        ResponseEntity<?> userResponse = getUserByName(userIn.getUsername());
+        if (userResponse.getStatusCode()!=HttpStatus.OK)
+            return userResponse;
+        ResponseEntity<?> checkUser = checkUserEdit(userIn, (User)userResponse.getBody());
+        if (checkUser.getStatusCode()!=HttpStatus.OK)
+            return checkUser;
+
+        User user = (User) userResponse.getBody();
         assert user != null;
         log.info("Update user info by username '"+user.getUsername()+"'.");
         if (!userIn.getFirstName().equals(user.getFirstName())) {
@@ -117,7 +122,7 @@ public class UserService {
         }
         //update user in couchbase
         userRepository.save(user);
-        return true;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     public boolean updatePassword(EditPassword editPassword, HttpServletRequest request){
@@ -145,8 +150,13 @@ public class UserService {
     }
 
     @Transactional
-    public boolean saveUser(UserRegistration user){
-        if (getUserByName(user.getUsername()).getStatusCode()==HttpStatus.OK) return false;
+    public ResponseEntity<?> saveUser(UserRegistration user){
+        if (getUserByName(user.getUsername()).getStatusCode()==HttpStatus.OK)
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        ResponseEntity<?> checkUser = checkUserRegistration(user);
+        if (checkUser.getStatusCode()!=HttpStatus.OK)
+            return checkUser;
+
         log.info("Save user '"+user.getUsername()+"'.");
         jdbcTemplate.update("insert into objects (name, type_id) values " +
                 "('"+user.getUsername()+"',"+Types.USER.ordinal()+")");
@@ -180,7 +190,57 @@ public class UserService {
         newUser.setPhoneNumber(user.getPhoneNumber());
         newUser.setAddress(user.getAddress());
         userRepository.save(newUser);
-        return true;
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private ResponseEntity checkUserRegistration(UserRegistration user){
+        //***Statuses
+        //'NOT_ACCEPTABLE'-user conflict
+        //'OK'-OK
+        //'GONE'-phone conflict
+        //'METHOD_NOT_ALLOWED'-email conflict
+        //'UNSUPPORTED_MEDIA_TYPE'-2&3
+
+        boolean phone = false;
+        boolean email = false;
+        QueryResult queryResult = cluster.query("SELECT d.*, meta(d).id FROM warestore AS d where _class='org.warestore.model.User' and phoneNumber='"+user.getPhoneNumber()+"'");
+        if (queryResult.rowsAs(User.class).size()!=0)
+            phone = true;
+        queryResult = cluster.query("SELECT d.*, meta(d).id FROM warestore AS d where _class='org.warestore.model.User' and email='"+user.getEmail()+"'");
+        if (queryResult.rowsAs(User.class).size()!=0)
+            email = true;
+        if (phone&&email)
+            return new ResponseEntity(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        if (phone)
+            return new ResponseEntity(HttpStatus.GONE);
+        if (email)
+            return new ResponseEntity(HttpStatus.METHOD_NOT_ALLOWED);
+        else return new ResponseEntity(HttpStatus.OK);
+    }
+
+    private ResponseEntity checkUserEdit(UserRegistration user, User currentUser){
+        //***Statuses
+        //'NOT_ACCEPTABLE'-user conflict
+        //'OK'-OK
+        //'GONE'-phone conflict
+        //'METHOD_NOT_ALLOWED'-email conflict
+        //'UNSUPPORTED_MEDIA_TYPE'-2&3
+
+        boolean phone = false;
+        boolean email = false;
+        QueryResult queryResult = cluster.query("SELECT d.*, meta(d).id FROM warestore AS d where _class='org.warestore.model.User' and phoneNumber='"+user.getPhoneNumber()+"'");
+        if (queryResult.rowsAs(User.class).size()!=0 && !user.getPhoneNumber().equals(currentUser.getPhoneNumber()))
+            phone = true;
+        queryResult = cluster.query("SELECT d.*, meta(d).id FROM warestore AS d where _class='org.warestore.model.User' and email='"+user.getEmail()+"'");
+        if (queryResult.rowsAs(User.class).size()!=0 && !user.getEmail().equals(currentUser.getEmail()))
+            email = true;
+        if (phone&&email)
+            return new ResponseEntity(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        if (phone)
+            return new ResponseEntity(HttpStatus.GONE);
+        if (email)
+            return new ResponseEntity(HttpStatus.METHOD_NOT_ALLOWED);
+        else return new ResponseEntity(HttpStatus.OK);
     }
 
     public ResponseEntity<?>getOrdersByUsername(HttpServletRequest request, int page){
