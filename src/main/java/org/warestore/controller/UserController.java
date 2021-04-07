@@ -49,10 +49,10 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistration userRegistration){
         try {
             ResponseEntity<?> register = userService.saveUser(userRegistration);
-            if (register.getStatusCode()!=HttpStatus.OK) return register;
-
-            else return authUser(new UserAuthentication(userRegistration.getUsername(),
-                    userRegistration.getPassword()));
+            if (register.getStatusCode()!=HttpStatus.OK)
+                return register;
+            else return new ResponseEntity<>(new Token(jwtProvider.generateToken(userRegistration.getUsername())),
+                    HttpStatus.OK);
         }
         catch (Exception ignored){
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -87,7 +87,7 @@ public class UserController {
     public ResponseEntity<?> updateUserPassword(@RequestBody @Valid EditPassword editPasswordIn, HttpServletRequest request){
         try{
             boolean editPassword = userService.updatePassword(editPasswordIn, request);
-            if (!editPassword) return new ResponseEntity<>(HttpStatus.CONFLICT);
+            if (!editPassword) return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             else return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception ignored){
